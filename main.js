@@ -3,7 +3,6 @@
 // @namespace          CSGOLounge Lounge Supplier
 // @author             Z8pn
 // @author_steam       http://steamcommunity.com/profiles/76561198142908602
-// @description  Simplifies trading Items by mass posting a given text and more :)
 // @include            /^http(s)?://(www.)?csgolounge.com//
 // @require http://code.jquery.com/jquery-2.1.1.js
 // @grant              GM_addStyle
@@ -581,7 +580,4 @@ Initialize.Settings = function () {
 }
 Initialize.ini();
 
-
-GM_addStyle(".offerstats {margin:auto;padding:5px 5px 5px 10px;background-color:#808080;width:150px;text-align:center;}")
 GM_addStyle(".ap { font-size : 12.8px }");
-GM_addStyle(".fbutton { cursor:pointer;text-align:center;font-family:Verdana, 'Lucida Sans Unicode', sans-serif;width:150px;background-color:#C0C0C0;padding:5px 10px 5px 10px; }");
