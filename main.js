@@ -111,10 +111,6 @@ Initialize.ini = function() {
     if (window.location.href.indexOf("profile") > -1) {   
 	   CurrentLoungeSite = "profile";
     }
-    if (window.location.href.indexOf("csgolounge.com") > -1 & CurrentLoungeSite == "none") {   
-		Initialize.MatchesLookup();
-		
-    }
 	document.getElementsByTagName("body")[0].style["background"] = "#AEAEAE url('../img/subbg.jpg') repeat-y scroll 100% 0px"
 	
 }
@@ -137,90 +133,6 @@ Initialize.addElements = function() {
 
 };
 
-
-Initialize.MatchesLookup = function () {
-console.log("Asking for Notification permission");
-	Notification.requestPermission(function (status) {
-      if (Notification.permission !== status) {
-        Notification.permission = status;
-      }
-    });
-	
-	
-console.log("Setting up Match Lookup");
-  $('.matchmain', document.body.innerHTML).each(function(index, value) {
-        if (!$('.match', value).hasClass('notaviable')) {
-            var matchid = value.getElementsByTagName("a")[0]
-			var matchid = matchid.href.replace("http://csgolounge.com/", "");
-            CurrentMatches[matchid] = true;
-        }
-    });
-
-setInterval(function(){
-	GM_xmlhttpRequest({
-	  method: "GET",
-	  url: "http://csgolounge.com/",
-	  onload: function(response) {
-				var doc = document.implementation.createHTMLDocument('');
-				doc.body.innerHTML = response.responseText;
-			    Initialize.NewMatch(doc);
-	  }
-	});
-
-}, 1000*60*5);
-}
-
-Initialize.NewMatch = function ( response ) {
-   var activeMatches = {};
-
-    $('.matchmain', response).each(function(index, value) {
-        if (!$('.match', value).hasClass('notaviable')) {
-            var matchid = value.getElementsByTagName("a")[0]
-            activeMatches[matchid.href] = true;
-        }
-    });
-	
-    if ($.isEmptyObject(activeMatches)) {
-        return false;
-    }
-
-        var newMatchStorageObject = CurrentMatches;
-        var newMatchesCount = 0;
-
-        $.each(activeMatches, function(index, value) {
-            if (typeof newMatchStorageObject[index] == 'undefined') {
-                console.log('Match #' + index + ' is new, adding to notify list and saving in local storage.');
-                newMatchStorageObject[index] = true;
-                newMatchesCount++;
-            }
-        });
-
-		CurrentMatches = newMatchStorageObject ;
-
-        if (newMatchesCount >= 1) {
-		
-				if (window.Notification && Notification.permission === "granted") {
-						  var options = {
-							  body: "A new CS:GO match has been added!"
-						  }
-						  new Notification("New Match",options);
-				}
-				else if (window.Notification && Notification.permission !== "denied") {
-					Notification.requestPermission(function (status) {
-						if (Notification.permission !== status) {
-						  Notification.permission = status;
-						}
-						if (status === "granted") {
-							var options = {
-							  body: "A new CS:GO match has been added!"
-						  }
-						  new Notification("New Match",options);
-						}
-					});
-				}	
-			}
-
-}
 
 
 Initialize.MyTrades = function () {
@@ -580,4 +492,7 @@ Initialize.Settings = function () {
 }
 Initialize.ini();
 
+
+GM_addStyle(".offerstats {margin:auto;padding:5px 5px 5px 10px;background-color:#808080;width:150px;text-align:center;}")
 GM_addStyle(".ap { font-size : 12.8px }");
+GM_addStyle(".fbutton { cursor:pointer;text-align:center;font-family:Verdana, 'Lucida Sans Unicode', sans-serif;width:150px;background-color:#C0C0C0;padding:5px 10px 5px 10px; }");
