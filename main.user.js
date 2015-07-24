@@ -9,7 +9,6 @@
 // @grant               GM_getValue
 // @grant               GM_setValue
 // @grant               GM_xmlhttpRequest
-// @downloadURL         https://raw.githubusercontent.com/Z8pn/LoungeSupplier/master/main.js
 // ==/UserScript==
 
 var Nickname;
@@ -17,6 +16,7 @@ var ItemInOffer;
 var TextToSend;
 var numberOfDaysBack;
 var CurrentLoungeSite;
+var settings = {};
 var CurrentMatches = {};
 var WaitBeforeOffers = 0; // Message box after each pop-up ?
 var WindowTimeOut = 5000; // MS after the window gets closed if the offer wasn´t posted
@@ -102,7 +102,8 @@ Initialize.ini = function() {
     Nickname = GM_getValue("Nickname","None");
     ItemInOffer = GM_getValue("offeritems","");
     numberOfDaysBack = GM_getValue("daysback",15);
-
+	settings = GM_getValue("settings",{});
+	
     TextToSend = GM_getValue("offertext","Please enter a text in the settings");
     if (TextToSend == "undefined"){
         TextToSend = "Please enter a text in the settings";
@@ -191,6 +192,7 @@ Initialize.match = function () {
     var teams = {}
     teams[team1] = {}
     teams[team1].matches = 0;
+    teams[team1].last5matches = new Array();
     teams[team1].won = 0;
     teams[team1].lost = 0;
     teams[team1].drawn = 0;
@@ -198,6 +200,7 @@ Initialize.match = function () {
     teams[team1].vsmatcheswon = 0;
     teams[team2] = {}
     teams[team2].matches = 0;
+	teams[team2].last5matches = new Array();
     teams[team2].won = 0;
     teams[team2].lost = 0;
     teams[team2].drawn = 0;
@@ -212,11 +215,14 @@ Initialize.match = function () {
     for (i = 0; i < JSON_OBject.length; i++) {
         var teama = JSON_OBject[i]["a"].toString();
         var teamb = JSON_OBject[i]["b"].toString();
+        var matchid = JSON_OBject[i]["match"].toString();
         var matchday = new Date(JSON_OBject[i]["when"].replace("-","/").replace("-","/")).getTime();
         if (today > matchday) {
             if (matchday > todayWithDaysBack) {
                 if (teama == team1 || teamb == team1) {
                     teams[team1].matches += 1;
+					teams[team1].last5matches.push("http://csgolounge.com/match?m="+matchid);
+
                     if (teama == team1) {
                         if (JSON_OBject[i]["winner"] == "a") {
                             teams[team1].won += 1;
@@ -240,6 +246,9 @@ Initialize.match = function () {
                     }
                 } else if (teama == team2 || teamb == team2) {
                     teams[team2].matches += 1;
+					
+					teams[team2].last5matches.push("http://csgolounge.com/match?m="+matchid);
+					
                     if (teama == team2) {
                         if (JSON_OBject[i]["winner"] == "a") {
                             teams[team2].won += 1;
@@ -307,7 +316,7 @@ Initialize.match = function () {
             }
         }
     }
-
+	
     teams[team1].ratio = (100/teams[team1].matches * teams[team1].won).toFixed(2);
     teams[team2].ratio = (100/teams[team2].matches * teams[team2].won).toFixed(2);
 
@@ -368,13 +377,27 @@ Initialize.match = function () {
             team1_matches_drawn.innerHTML = teams[team1].drawn + " Matches Drawn";
             team1_display.appendChild(team1_matches_drawn);
         }
-
-        var team1_winratio= document.createElement('div');
-        team1_winratio.style["padding-top"] = "6px";
-        team1_winratio.style["text-align"] = "center";
-        team1_winratio.style["font-size"] = "11px";
-        team1_winratio.innerHTML = teams[team1].ratio + "% Winratio";
-        team1_display.appendChild(team1_winratio);
+		
+		
+		if (settings["teamstatsop1"] == "winratio") {
+			var team1_winratio= document.createElement('div');
+			team1_winratio.style["padding-top"] = "6px";
+			team1_winratio.style["text-align"] = "center";
+			team1_winratio.style["font-size"] = "11px";
+			team1_winratio.innerHTML = teams[team1].ratio + "% Winratio";
+			team1_display.appendChild(team1_winratio);
+		} else {
+				var last5 = teams[team1].last5matches.slice(-5);
+				
+					var matchlink = document.createElement('div');
+					matchlink.style["padding-top"] = "6px";
+					matchlink.style["text-align"] = "center";
+					matchlink.style["font-size"] = "11px";
+					for (var i=0; i<last5.length; i++) {
+					matchlink.innerHTML = matchlink.innerHTML + "<a href="+last5[i]+">["+(i+1)+"]</a>  ";
+					}
+					team1_display.appendChild(matchlink);
+		}
     } else {
         var team1_info= document.createElement('div');
         team1_info.style["padding-top"] = "6px";
@@ -430,12 +453,26 @@ Initialize.match = function () {
             team2_display.appendChild(team2_matches_drawn);
         }
 
-        var team2_winratio= document.createElement('div');
-        team2_winratio.style["padding-top"] = "5px";
-        team2_winratio.style["text-align"] = "center";
-        team2_winratio.style["font-size"] = "11px";
-        team2_winratio.innerHTML = teams[team2].ratio + "% Winratio";
-        team2_display.appendChild(team2_winratio);
+		if (settings["teamstatsop1"] == "winratio") {
+			var team2_winratio= document.createElement('div');
+			team2_winratio.style["padding-top"] = "6px";
+			team2_winratio.style["text-align"] = "center";
+			team2_winratio.style["font-size"] = "11px";
+			team2_winratio.innerHTML = teams[team2].ratio + "% Winratio";
+			team2_display.appendChild(team2_winratio);
+		} else {
+					var last5 = teams[team2].last5matches.slice(-5);
+					var matchlink = document.createElement('div');
+					matchlink.style["padding-top"] = "6px";
+					matchlink.style["text-align"] = "center";
+					matchlink.style["font-size"] = "11px";
+					for (var i=0; i<last5.length; i++) {
+					matchlink.innerHTML = matchlink.innerHTML + "<a href="+last5[i]+">["+(i+1)+"]</a>  ";
+					}
+					team2_display.appendChild(matchlink);
+		}
+		
+		
     } else {
         var team2_info= document.createElement('div');
         team2_info.style["padding-top"] = "6px";
@@ -827,6 +864,7 @@ Initialize.Settings = function () {
         ctext.setAttribute('placeholder',"Enter your nickname here, used for getting your posts!");
         ctext.style["margin-top"] = "25px";
         ctext.style["width"] = "100%";
+		ctext.style["height"] = "20px";
         ctext.setAttribute('value',"");
         ctext.setAttribute('id',"Nickname");
         curElement.appendChild(ctext);
@@ -856,6 +894,7 @@ Initialize.Settings = function () {
     dback_text.setAttribute('placeholder',"Please enter the the amount of days you want the statistic of each team to check");
     dback_text.style["margin-top"] = "25px";
     dback_text.style["width"] = "100%";
+    dback_text.style["height"] = "20px";
     dback_text.setAttribute('value',"");
     dback_text.setAttribute('id',"DaysBack");
     curElement.appendChild(dback_text);
@@ -879,6 +918,36 @@ Initialize.Settings = function () {
        alert("Saved");
        console.log("Changed 'daysback'");
    });
+		var settings_last5matches = document.createElement('div');
+		settings_last5matches.setAttribute('class',"button");
+		settings_last5matches.style["cursor"] = "pointer";
+		settings_last5matches.style["margin-top"] = "50px";
+		settings_last5matches.style["margin-left"] = "50px";
+
+		settings_last5matches.innerHTML = "Show Last 5 Matches";
+		curElement.appendChild(settings_last5matches);
+
+
+		settings_last5matches.addEventListener("click", function (event) {
+			settings["teamstatsop1"] = "last5matches";
+			GM_setValue("settings",settings);
+			alert("Saved");
+		});
+		
+		var settings_showwinratio = document.createElement('div');
+		settings_showwinratio.setAttribute('class',"button");
+		settings_showwinratio.style["cursor"] = "pointer";
+		settings_showwinratio.style["margin-top"] = "50px";
+
+		settings_showwinratio.innerHTML = "Show Win Ratio";
+		curElement.appendChild(settings_showwinratio);
+
+
+		settings_showwinratio.addEventListener("click", function (event) {
+			settings["teamstatsop1"] = "winratio";
+			GM_setValue("settings",settings);
+			alert("Saved");
+		});
 }
 
 Initialize.ini();
