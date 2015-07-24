@@ -4,7 +4,7 @@
 // @author             Z8pn
 // @author_steam       http://steamcommunity.com/profiles/76561198142908602
 // @include            /^http(s)?://(www.)?csgolounge.com//
-// @require http://code.jquery.com/jquery-2.1.1.js
+// @require 			http://code.jquery.com/jquery-2.1.1.js
 // @grant              GM_addStyle
 // @grant              GM_getValue
 // @grant              GM_setValue
@@ -23,6 +23,38 @@ var WindowCanTimeout = 0; // Window closes itself if no response.
 var useful = {};
 var Initialize = {};
 
+
+
+useful.getTodaysDate = function() {
+   var now     = new Date(); 
+    var year    = now.getFullYear();
+    var month   = now.getMonth()+1; 
+    var day     = now.getDate();
+    var hour    = now.getHours();
+    var minute  = now.getMinutes();
+    var second  = now.getSeconds(); 
+    if(month.toString().length == 1) {
+        var month = '0'+month;
+    }
+    if(day.toString().length == 1) {
+        var day = '0'+day;
+    }   
+    if(hour.toString().length == 1) {
+        var hour = '0'+hour;
+    }
+    if(minute.toString().length == 1) {
+        var minute = '0'+minute;
+    }
+    if(second.toString().length == 1) {
+        var second = '0'+second;
+    }   
+    var dateTime = year+'/'+month+'/'+day+' '+hour+':'+minute+':'+second;   
+     return dateTime;
+  }
+
+
+
+
 useful.getUrlPart = function( name, url ) {
       if (!url) url = location.href
       name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
@@ -33,15 +65,11 @@ useful.getUrlPart = function( name, url ) {
 }
 
 useful.InsertAfter = function (newElement,targetElement) {
-    //target is what you want it to go after. Look for this elements parent.
     var parent = targetElement.parentNode;
 
-    //if the parents lastchild is the targetElement...
     if(parent.lastchild == targetElement) {
-        //add the newElement after the target element.
         parent.appendChild(newElement);
         } else {
-        // else the target has siblings, insert the new element between the target and it's next sibling.
         parent.insertBefore(newElement, targetElement.nextSibling);
         }
 }
@@ -100,6 +128,10 @@ Initialize.ini = function() {
         Initialize.MyOffers();
 		CurrentLoungeSite = "offers";
     }
+    if (window.location.href.indexOf("match?") > -1) {   
+        Initialize.match();
+		CurrentLoungeSite = "matchsite";
+    }
     if (window.location.href.indexOf("mytrades") > -1) {   
         Initialize.MyTrades();
 		CurrentLoungeSite = "mytrades";
@@ -134,7 +166,359 @@ Initialize.addElements = function() {
 };
 
 
+Initialize.match = function () {
+function UpdateMatchHistory() {
+		GM_xmlhttpRequest({
+		  method: "GET",
+		  url: "http://csgolounge.com/api/matches.php",
+		  onload: function(response) {
+			alert("Updated Match History");
+			GM_setValue("matches",$.parseJSON(response.response));
+		  }
+		});
+	}
 
+if (GM_getValue("matches") == "undefined") {
+	UpdateMatchHistory()
+}
+
+	document.getElementsByTagName("span")[1].innerHTML = "<a id = 'refresh' style='font-size:10px'>refresh</a> <br>" + document.getElementsByTagName("span")[1].innerHTML
+	document.getElementById("refresh").addEventListener('click', function(mouseEvent) {
+        UpdateMatchHistory();
+    });
+	
+	var team1 = document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML.toString();
+	var team2 = document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML.toString();
+	
+	team1 = team1.replace(" (win)","");
+	team2 = team2.replace(" (win)","");
+	
+	
+	var JSON_OBject = GM_getValue("matches");
+	var teams = {}
+	teams[team1] = {}
+	teams[team1].matches = 0;
+	teams[team1].won = 0;
+	teams[team1].lost = 0;
+	teams[team1].drawn = 0;
+	teams[team1].ratio = 0;
+	teams[team1].vsmatcheswon = 0;
+	teams[team2] = {}
+	teams[team2].matches = 0;
+	teams[team2].won = 0;
+	teams[team2].lost = 0;
+	teams[team2].drawn = 0;
+	teams[team2].ratio = 0;
+	teams[team2].vsmatcheswon = 0;
+	teams.vsmatches = 0;	
+	
+	
+		var today = new Date(useful.getTodaysDate()).getTime();
+
+		for (i = 0; i < JSON_OBject.length; i++) {
+			var teama = JSON_OBject[i]["a"].toString();
+			var teamb = JSON_OBject[i]["b"].toString();
+			var matchday = new Date(JSON_OBject[i]["when"].replace("-","/").replace("-","/")).getTime();
+			if (today > matchday) {		
+				if (teama == team1 || teamb == team1) {
+					teams[team1].matches += 1;
+					if (teama == team1) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team1].won += 1;
+						} else {
+							if (JSON_OBject[i]["winner"] == "") {
+								teams[team1].drawn += 1;
+							} else {	
+								teams[team1].lost += 1;
+							}
+						}
+					} else if (teamb == team1) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team1].won += 1;
+						} else {
+							if (JSON_OBject[i]["winner"] == "") {
+								teams[team1].drawn += 1;
+							} else {	
+								teams[team1].lost += 1;
+							}
+						}
+					}
+				} else if (teama == team2 || teamb == team2) {
+					teams[team2].matches += 1;
+					if (teama == team2) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team2].won += 1;
+						} else {
+							if (JSON_OBject[i]["winner"] == "") {
+								teams[team2].drawn += 1;
+							} else {	
+								teams[team2].lost += 1;
+							}
+						} 
+					} else if (teamb == team2) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team2].won += 1;
+						} else {
+							if (JSON_OBject[i]["winner"] == "") {
+								teams[team2].drawn += 1;
+							} else {
+								teams[team2].lost += 1;
+							}
+						}
+					}
+				} 
+				
+				if (teama == team1 && teamb == team2) {
+					teams.vsmatches += 1;
+					if (teama == team2) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team2].vsmatcheswon += 1;
+						}
+					} else if (teamb == team2) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team2].vsmatcheswon += 1;
+						}
+					}
+					if (teama == team1) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team1].vsmatcheswon += 1;
+						}
+					} else if (teamb == team1) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team1].vsmatcheswon += 1;
+						}
+					}
+				} else if (teama == team2 && teamb == team1) {
+					teams.vsmatches += 1;
+					if (teama == team2) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team2].vsmatcheswon += 1;
+						}
+					} else if (teamb == team2) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team2].vsmatcheswon += 1;
+						}
+					}
+					if (teama == team1) {
+						if (JSON_OBject[i]["winner"] == "a") {
+							teams[team1].vsmatcheswon += 1;
+						}
+					} else if (teamb == team1) {
+						if (JSON_OBject[i]["winner"] == "b") {
+							teams[team1].vsmatcheswon += 1;
+						}
+					}
+				}
+			}
+		}
+	
+	teams[team1].ratio = (100/teams[team1].matches * teams[team1].won).toFixed(2);
+	teams[team2].ratio = (100/teams[team2].matches * teams[team2].won).toFixed(2);
+
+	var fullbar = document.getElementsByClassName("full")[0];
+	var spoiler_bar = document.createElement('div');
+	spoiler_bar.setAttribute('id',"bet_stats");
+    spoiler_bar.style["cursor"] = "pointer";
+    spoiler_bar.style["width"] = "50%";
+    spoiler_bar.style["height"] = "13px";
+    spoiler_bar.style["overflow"] = "hidden";
+    spoiler_bar.innerHTML = "<div id='bet_stats_title'>Match Stats ( click to expand )</div>";
+    fullbar.appendChild(spoiler_bar);
+	fullbar.insertBefore(spoiler_bar, fullbar.childNodes[0]);
+
+	var team1_display = document.createElement('div');
+	team1_display.setAttribute('id',"bet_stats");
+    team1_display.style["cursor"] = "pointer";
+    team1_display.style["margin-top"] = "12px";
+    team1_display.style["width"] = "46.5%";
+    team1_display.style["height"] = "50%";
+    team1_display.style["float"] = "left";
+    team1_display.style["background-color"] = "darkgreen";
+    team1_display.innerHTML = team1;
+    spoiler_bar.appendChild(team1_display);
+	
+	
+	
+	
+		// creating statistics for team1
+			if (teams[team1].matches >= 1) {
+				var team1_matches_played = document.createElement('div');
+				team1_matches_played.style["padding-top"] = "6px";
+				team1_matches_played.style["text-align"] = "center";
+				team1_matches_played.style["font-size"] = "11px";
+				team1_matches_played.innerHTML = teams[team1].matches+" Matches Played";
+				team1_display.appendChild(team1_matches_played);
+				
+				var team1_matches_won = document.createElement('div');
+				team1_matches_won.style["padding-top"] = "6px";
+				team1_matches_won.style["text-align"] = "center";
+				team1_matches_won.style["font-size"] = "11px";
+				team1_matches_won.innerHTML = teams[team1].won+" Matches Won";
+				team1_display.appendChild(team1_matches_won);
+				
+				var team1_matches_lost = document.createElement('div');
+				team1_matches_lost.style["padding-top"] = "6px";
+				team1_matches_lost.style["text-align"] = "center";
+				team1_matches_lost.style["font-size"] = "11px";
+				team1_matches_lost.innerHTML = teams[team1].lost+" Matches Lost";
+				team1_display.appendChild(team1_matches_lost);
+				
+				
+				if (teams[team1].drawn >= 1) {
+					var team1_matches_drawn = document.createElement('div');
+					team1_matches_drawn.style["padding-top"] = "6px";
+					team1_matches_drawn.style["text-align"] = "center";
+					team1_matches_drawn.style["font-size"] = "11px";
+					team1_matches_drawn.innerHTML = teams[team1].drawn + " Matches Drawn";
+					team1_display.appendChild(team1_matches_drawn);
+				}
+				
+				var team1_winratio= document.createElement('div');
+				team1_winratio.style["padding-top"] = "6px";
+				team1_winratio.style["text-align"] = "center";
+				team1_winratio.style["font-size"] = "11px";
+				team1_winratio.innerHTML = teams[team1].ratio + "% Winratio";
+				team1_display.appendChild(team1_winratio);
+			} else {
+				var team1_info= document.createElement('div');
+				team1_info.style["padding-top"] = "6px";
+				team1_info.style["text-align"] = "center";
+				team1_info.style["font-size"] = "11px";
+				team1_info.innerHTML = "No Data for this Team"
+				team1_display.appendChild(team1_info);
+			
+			}
+		
+		
+		//--
+		
+	
+	var team2_display = document.createElement('div');
+	team2_display.setAttribute('id',"bet_stats");
+    team2_display.style["cursor"] = "pointer";
+    team2_display.style["margin-top"] = "12px";	
+    team2_display.style["width"] = "46.5%";
+    team2_display.style["height"] = "50%";
+    team2_display.style["float"] = "right";
+    team2_display.style["background-color"] = "darkgreen";
+    team2_display.innerHTML = team2;
+    spoiler_bar.appendChild(team2_display);
+	
+	
+		// creating statistics for team2
+			if (teams[team2].matches >= 1) {
+				var team2_matches_played = document.createElement('div');
+				team2_matches_played.style["padding-top"] = "6px";
+				team2_matches_played.style["text-align"] = "center";
+				team2_matches_played.style["font-size"] = "11px";
+				team2_matches_played.innerHTML = teams[team2].matches + " Matches Played";
+				team2_display.appendChild(team2_matches_played);
+				
+				var team2_matches_won = document.createElement('div');
+				team2_matches_won.style["padding-top"] = "6px";
+				team2_matches_won.style["text-align"] = "center";
+				team2_matches_won.style["font-size"] = "11px";
+				team2_matches_won.innerHTML = teams[team2].won + " Matches Won";
+				team2_display.appendChild(team2_matches_won);
+				
+				var team2_matches_lost = document.createElement('div');
+				team2_matches_lost.style["padding-top"] = "6px";
+				team2_matches_lost.style["text-align"] = "center";
+				team2_matches_lost.style["font-size"] = "11px";
+				team2_matches_lost.innerHTML = teams[team2].lost + " Matches Lost";
+				team2_display.appendChild(team2_matches_lost);
+				
+				if (teams[team2].drawn >= 1) {
+					var team2_matches_drawn = document.createElement('div');
+					team2_matches_drawn.style["padding-top"] = "6px";
+					team2_matches_drawn.style["text-align"] = "center";
+					team2_matches_drawn.style["font-size"] = "11px";
+					team2_matches_drawn.innerHTML = teams[team2].drawn + " Matches Drawn";
+					team2_display.appendChild(team2_matches_drawn);
+				}
+				
+				var team2_winratio= document.createElement('div');
+				team2_winratio.style["padding-top"] = "5px";
+				team2_winratio.style["text-align"] = "center";
+				team2_winratio.style["font-size"] = "11px";
+				team2_winratio.innerHTML = teams[team2].ratio + "% Winratio";
+				team2_display.appendChild(team2_winratio);
+			} else {
+				var team2_info= document.createElement('div');
+				team2_info.style["padding-top"] = "6px";
+				team2_info.style["text-align"] = "center";
+				team2_info.style["font-size"] = "11px";
+				team2_info.innerHTML = "No Data for this Team"
+				team2_display.appendChild(team2_info);
+			}
+	
+	
+	
+	var versus_display = document.createElement('div');
+	versus_display.setAttribute('id',"bet_stats");
+    versus_display.style["cursor"] = "pointer";
+    versus_display.style["width"] = "97.5%";
+    versus_display.style["height"] = "24%";
+    versus_display.style["float"] = "left";
+    versus_display.style["background-color"] = "#810083";
+    versus_display.innerHTML = team1 + " vs " +team2 +" stats";
+    spoiler_bar.appendChild(versus_display);
+		
+			if (teams.vsmatches >= 1) {
+				var versus_matches_played = document.createElement('div');
+				versus_matches_played.style["padding-top"] = "5px";
+				versus_matches_played.style["text-align"] = "center";
+				versus_matches_played.style["font-size"] = "11px";
+				versus_matches_played.innerHTML = teams.vsmatches + " Matches Played against eachother";
+				versus_display.appendChild(versus_matches_played);
+				
+				
+				var versus_won_team1 = document.createElement('div');
+				versus_won_team1.style["padding-top"] = "5px";
+				versus_won_team1.style["text-align"] = "center";
+				versus_won_team1.style["float"] = "left";
+				versus_won_team1.style["padding-left"] = "2px";
+				versus_won_team1.style["font-size"] = "11px";
+				versus_won_team1.innerHTML = team1 + " won " + teams[team1].vsmatcheswon + " of them";
+				versus_display.appendChild(versus_won_team1);
+				
+				var versus_won_team2 = document.createElement('div');
+				versus_won_team2.style["padding-top"] = "5px";
+				versus_won_team2.style["text-align"] = "center";
+				versus_won_team2.style["float"] = "right";
+				versus_won_team2.style["padding-right"] = "2px";
+				versus_won_team2.style["font-size"] = "11px";
+				versus_won_team2.innerHTML = team2 + " won " + teams[team2].vsmatcheswon + " of them";
+				versus_display.appendChild(versus_won_team2);
+				
+	
+			} else {
+				var versus_info = document.createElement('div');
+				versus_info.style["padding-top"] = "5px";
+				versus_info.style["text-align"] = "center";
+				versus_info.style["padding-right"] = "2px";
+				versus_info.style["font-size"] = "11px";
+				versus_info.innerHTML = "No Versus Data for this two Teams";
+				versus_display.appendChild(versus_info);
+			}
+			
+	
+	
+	spoiler_bar.addEventListener("click", function (event) {
+			var box = $(this);
+			if(box.hasClass("opened")){
+				box.css({"width":"50%","height":"13","overflow":"hidden"});
+				$("#bet_stats_title").html("Match Stats ( click to expand )");
+				box.removeClass("opened");
+			} else if (!box.hasClass("opened")){
+				box.css({"width":"50%","height":"200","overflow":"visible"});
+				box.addClass("opened");
+				$("#bet_stats_title").html("Match Stats ( click to retract )");
+			};
+	});
+
+	GM_addStyle("#bet_stats {text-align:center;font-size:12px;margin:auto;border-radius: 5px;padding:5px 5px 5px 5px;margin-bottom:8px;background-color:#808080}")
+}
 Initialize.MyTrades = function () {
 	if ( window.location.href.indexOf("#autobump") > -1){
 		setInterval(function(){
@@ -142,7 +526,7 @@ Initialize.MyTrades = function () {
 		},1000*60*5);
 	}
 
-   var m_t_list = document.getElementsByClassName("standard")[0];
+    var m_t_list = document.getElementsByClassName("standard")[0];
     var m_t_btn = document.createElement('div');
     m_t_btn.setAttribute('class',"button");
     m_t_btn.style["cursor"] = "pointer";
@@ -492,7 +876,4 @@ Initialize.Settings = function () {
 }
 Initialize.ini();
 
-
-GM_addStyle(".offerstats {margin:auto;padding:5px 5px 5px 10px;background-color:#808080;width:150px;text-align:center;}")
 GM_addStyle(".ap { font-size : 12.8px }");
-GM_addStyle(".fbutton { cursor:pointer;text-align:center;font-family:Verdana, 'Lucida Sans Unicode', sans-serif;width:150px;background-color:#C0C0C0;padding:5px 10px 5px 10px; }");
