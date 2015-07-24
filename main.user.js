@@ -172,7 +172,7 @@ Initialize.match = function () {
         });
     };
 
-    if (GM_getValue("matches") == "undefined") {
+    if (GM_getValue("matches","undefined") == "undefined") {
         UpdateMatchHistory()
     }
 
@@ -183,6 +183,7 @@ Initialize.match = function () {
 
     var team1 = document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML.toString();
     var team2 = document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML.toString();
+   
 
     team1 = team1.replace(" (win)","");
     team2 = team2.replace(" (win)","");
@@ -216,6 +217,7 @@ Initialize.match = function () {
         var teama = JSON_OBject[i]["a"].toString();
         var teamb = JSON_OBject[i]["b"].toString();
         var matchid = JSON_OBject[i]["match"].toString();
+        var bo = JSON_OBject[i]["format"].toString();
         var matchday = new Date(JSON_OBject[i]["when"].replace("-","/").replace("-","/")).getTime();
         if (today > matchday) {
             if (matchday > todayWithDaysBack) {
@@ -948,6 +950,7 @@ Initialize.Settings = function () {
 			GM_setValue("settings",settings);
 			alert("Saved");
 		});
+		
 }
 
 Initialize.ini();
