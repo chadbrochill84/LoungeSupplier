@@ -15,3 +15,4 @@ It gives you the option to AutoBump your trades and remove all your offers at on
 5. Click "Scrape Trades" and it´ll get all trades and post below them. ( you can automate this by clicking on "auto")
 
 Basicly it should look something like this if you are offering keys ( http://i.imgur.com/5fuQ9fo.jpg )
+###TEST
