@@ -18,5 +18,7 @@ Click here to install the Script : https://raw.githubusercontent.com/Z8pn/Lounge
 ## Guides
 1. How to get an Items "ID" : http://i.imgur.com/wTE9xat.gif
 
+2. How to use the "Auto Trade Poster" : http://i.imgur.com/wqg58IY.gif
+
 
 
