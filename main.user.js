@@ -133,11 +133,11 @@ Initialize.ini = function() {
         CurrentLoungeSite = "mytrades";
     }
     if (window.location.href.indexOf("#settings") > -1) {
-       Initialize.Settings();
-       CurrentLoungeSite = "settings";
+        Initialize.Settings();
+        CurrentLoungeSite = "settings";
     }
     if (window.location.href.indexOf("profile") > -1) {
-       CurrentLoungeSite = "profile";
+        CurrentLoungeSite = "profile";
     }
     document.getElementsByTagName("body")[0].style["background"] = "#AEAEAE url('../img/subbg.jpg') repeat-y scroll 100% 0px"
 }
@@ -766,6 +766,7 @@ Initialize.Settings = function () {
     });
 
     //document.head.innerHTML = "";
+    document.body.innerHTML = "";
     document.body.style["background"] = "darkgreen";
     document.head.style["background"] = "darkgreen";
 
