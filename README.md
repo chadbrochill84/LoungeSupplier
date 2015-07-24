@@ -10,6 +10,10 @@ It also provides a simple statistic overview for matches / teams.
 
 Click here to install the Script : https://raw.githubusercontent.com/Z8pn/LoungeSupplier/master/main.user.js
 
+## How to install on chrome ?
+  http://i.imgur.com/xkHBR1Z.gif
+
+
 
 ## Guides
 1. How to get an Items "ID" : http://i.imgur.com/wTE9xat.gif
