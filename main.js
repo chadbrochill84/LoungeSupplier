@@ -15,6 +15,7 @@
 var Nickname;
 var ItemInOffer;
 var TextToSend;
+var numberOfDaysBack;
 var CurrentLoungeSite;
 var CurrentMatches = {};
 var WaitBeforeOffers = 0; // Message box after each pop-up ?
@@ -23,7 +24,6 @@ var WindowCanTimeout = 0; // Window closes itself if no response.
 
 var useful = {};
 var Initialize = {};
-
 
 
 useful.getTodaysDate = function() {
@@ -108,6 +108,8 @@ Initialize.ini = function() {
 	Initialize.addElements();
     Nickname = GM_getValue("Nickname","None");
     ItemInOffer = GM_getValue("offeritems","");
+	numberOfDaysBack = GM_getValue("daysback",15);
+	
     TextToSend = GM_getValue("offertext","Please enter a text in the settings");
     if (TextToSend == "undefined"){
         TextToSend = "Please enter a text in the settings";
@@ -159,7 +161,7 @@ Initialize.addElements = function() {
 
         curElement.appendChild(settings);
         settings.addEventListener('click', function(mouseEvent) {
-            var myWindow=window.open('http://csgolounge.com/#settings','','width=600,height=360,resizable=0,scrollbars=0,left=0,top=0');
+            var myWindow=window.open('http://csgolounge.com/#settings','','width=650,height=500,resizable=0,scrollbars=0,left=0,top=0');
 
         });
     }
@@ -215,98 +217,101 @@ if (GM_getValue("matches") == "undefined") {
 	
 	
 		var today = new Date(useful.getTodaysDate()).getTime();
+		var todayWithDaysBack = new Date(useful.getTodaysDate()).getTime() - (numberOfDaysBack * 24 * 60 * 60 * 1000);
 
 		for (i = 0; i < JSON_OBject.length; i++) {
 			var teama = JSON_OBject[i]["a"].toString();
 			var teamb = JSON_OBject[i]["b"].toString();
 			var matchday = new Date(JSON_OBject[i]["when"].replace("-","/").replace("-","/")).getTime();
 			if (today > matchday) {		
-				if (teama == team1 || teamb == team1) {
-					teams[team1].matches += 1;
-					if (teama == team1) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team1].won += 1;
-						} else {
-							if (JSON_OBject[i]["winner"] == "") {
-								teams[team1].drawn += 1;
-							} else {	
-								teams[team1].lost += 1;
-							}
-						}
-					} else if (teamb == team1) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team1].won += 1;
-						} else {
-							if (JSON_OBject[i]["winner"] == "") {
-								teams[team1].drawn += 1;
-							} else {	
-								teams[team1].lost += 1;
-							}
-						}
-					}
-				} else if (teama == team2 || teamb == team2) {
-					teams[team2].matches += 1;
-					if (teama == team2) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team2].won += 1;
-						} else {
-							if (JSON_OBject[i]["winner"] == "") {
-								teams[team2].drawn += 1;
-							} else {	
-								teams[team2].lost += 1;
-							}
-						} 
-					} else if (teamb == team2) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team2].won += 1;
-						} else {
-							if (JSON_OBject[i]["winner"] == "") {
-								teams[team2].drawn += 1;
+				if (matchday > todayWithDaysBack) {	
+					if (teama == team1 || teamb == team1) {
+						teams[team1].matches += 1;
+						if (teama == team1) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team1].won += 1;
 							} else {
-								teams[team2].lost += 1;
+								if (JSON_OBject[i]["winner"] == "") {
+									teams[team1].drawn += 1;
+								} else {	
+									teams[team1].lost += 1;
+								}
+							}
+						} else if (teamb == team1) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team1].won += 1;
+							} else {
+								if (JSON_OBject[i]["winner"] == "") {
+									teams[team1].drawn += 1;
+								} else {	
+									teams[team1].lost += 1;
+								}
 							}
 						}
-					}
-				} 
-				
-				if (teama == team1 && teamb == team2) {
-					teams.vsmatches += 1;
-					if (teama == team2) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team2].vsmatcheswon += 1;
+					} else if (teama == team2 || teamb == team2) {
+						teams[team2].matches += 1;
+						if (teama == team2) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team2].won += 1;
+							} else {
+								if (JSON_OBject[i]["winner"] == "") {
+									teams[team2].drawn += 1;
+								} else {	
+									teams[team2].lost += 1;
+								}
+							} 
+						} else if (teamb == team2) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team2].won += 1;
+							} else {
+								if (JSON_OBject[i]["winner"] == "") {
+									teams[team2].drawn += 1;
+								} else {
+									teams[team2].lost += 1;
+								}
+							}
 						}
-					} else if (teamb == team2) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team2].vsmatcheswon += 1;
+					} 
+					
+					if (teama == team1 && teamb == team2) {
+						teams.vsmatches += 1;
+						if (teama == team2) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team2].vsmatcheswon += 1;
+							}
+						} else if (teamb == team2) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team2].vsmatcheswon += 1;
+							}
 						}
-					}
-					if (teama == team1) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team1].vsmatcheswon += 1;
+						if (teama == team1) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team1].vsmatcheswon += 1;
+							}
+						} else if (teamb == team1) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team1].vsmatcheswon += 1;
+							}
 						}
-					} else if (teamb == team1) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team1].vsmatcheswon += 1;
+					} else if (teama == team2 && teamb == team1) {
+						teams.vsmatches += 1;
+						if (teama == team2) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team2].vsmatcheswon += 1;
+							}
+						} else if (teamb == team2) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team2].vsmatcheswon += 1;
+							}
 						}
-					}
-				} else if (teama == team2 && teamb == team1) {
-					teams.vsmatches += 1;
-					if (teama == team2) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team2].vsmatcheswon += 1;
-						}
-					} else if (teamb == team2) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team2].vsmatcheswon += 1;
-						}
-					}
-					if (teama == team1) {
-						if (JSON_OBject[i]["winner"] == "a") {
-							teams[team1].vsmatcheswon += 1;
-						}
-					} else if (teamb == team1) {
-						if (JSON_OBject[i]["winner"] == "b") {
-							teams[team1].vsmatcheswon += 1;
+						if (teama == team1) {
+							if (JSON_OBject[i]["winner"] == "a") {
+								teams[team1].vsmatcheswon += 1;
+							}
+						} else if (teamb == team1) {
+							if (JSON_OBject[i]["winner"] == "b") {
+								teams[team1].vsmatcheswon += 1;
+							}
 						}
 					}
 				}
@@ -323,7 +328,7 @@ if (GM_getValue("matches") == "undefined") {
     spoiler_bar.style["width"] = "50%";
     spoiler_bar.style["height"] = "13px";
     spoiler_bar.style["overflow"] = "hidden";
-    spoiler_bar.innerHTML = "<div id='bet_stats_title'>Match Stats ( click to expand )</div>";
+    spoiler_bar.innerHTML = "<div id='bet_stats_title'>Team Stats ( click to expand )</div>";
     fullbar.appendChild(spoiler_bar);
 	fullbar.insertBefore(spoiler_bar, fullbar.childNodes[0]);
 
@@ -335,7 +340,7 @@ if (GM_getValue("matches") == "undefined") {
     team1_display.style["height"] = "50%";
     team1_display.style["float"] = "left";
     team1_display.style["background-color"] = "darkgreen";
-    team1_display.innerHTML = team1;
+    team1_display.innerHTML = team1 + " <p style='font-size:10px;'>data from the last "+numberOfDaysBack+" days </p>";
     spoiler_bar.appendChild(team1_display);
 	
 	
@@ -402,7 +407,7 @@ if (GM_getValue("matches") == "undefined") {
     team2_display.style["height"] = "50%";
     team2_display.style["float"] = "right";
     team2_display.style["background-color"] = "darkgreen";
-    team2_display.innerHTML = team2;
+    team2_display.innerHTML = team2 + " <p style='font-size:10px;'>data from the last "+numberOfDaysBack+" days </p>";;
     spoiler_bar.appendChild(team2_display);
 	
 	
@@ -462,12 +467,12 @@ if (GM_getValue("matches") == "undefined") {
     versus_display.style["height"] = "24%";
     versus_display.style["float"] = "left";
     versus_display.style["background-color"] = "#810083";
-    versus_display.innerHTML = team1 + " vs " +team2 +" stats";
+    versus_display.innerHTML = "<p style='font-size:10px;'> " + team1 + " vs " +team2 +" stats </p>"  + " <p style='font-size:10px;'>data from the last "+numberOfDaysBack+" days </p>";
     spoiler_bar.appendChild(versus_display);
 		
 			if (teams.vsmatches >= 1) {
 				var versus_matches_played = document.createElement('div');
-				versus_matches_played.style["padding-top"] = "5px";
+				versus_matches_played.style["padding-top"] = "2px";
 				versus_matches_played.style["text-align"] = "center";
 				versus_matches_played.style["font-size"] = "11px";
 				versus_matches_played.innerHTML = teams.vsmatches + " Matches Played against eachother";
@@ -509,12 +514,12 @@ if (GM_getValue("matches") == "undefined") {
 			var box = $(this);
 			if(box.hasClass("opened")){
 				box.css({"width":"50%","height":"13","overflow":"hidden"});
-				$("#bet_stats_title").html("Match Stats ( click to expand )");
+				$("#bet_stats_title").html("Team Stats ( click to expand )");
 				box.removeClass("opened");
 			} else if (!box.hasClass("opened")){
 				box.css({"width":"50%","height":"200","overflow":"visible"});
 				box.addClass("opened");
-				$("#bet_stats_title").html("Match Stats ( click to retract )");
+				$("#bet_stats_title").html("Team Stats ( click to retract )");
 			};
 	});
 
@@ -767,16 +772,22 @@ Initialize.MyOffers = function () {
         });
 }
 Initialize.Settings = function () {
-	   document.head.innerHTML = "";
+		$(document).ready(function() {
+		document.body.removeAttribute("style");
+		 document.body.style["background"] = "lightgrey";
+		});
+
+	   //document.head.innerHTML = "";
        document.body.innerHTML = "";
-       document.body.style.background = "#D7D7D7";
-        
+       document.body.style["background"] = "darkgreen";
+       document.head.style["background"] = "darkgreen";
+
        var curElement = document.getElementsByTagName("body")[0]
        if (curElement){
        
        var offertext = document.createElement('textarea');
           offertext.setAttribute('placeholder',"Enter your text here"); 
-          offertext.style.width = "580px";
+          offertext.style.width = "100%";
           offertext.setAttribute('value',GM_getValue("offertext"));
           offertext.setAttribute('id',"offertext");
        curElement.appendChild(offertext);
@@ -785,29 +796,24 @@ Initialize.Settings = function () {
           };
 
        var setOfferText = document.createElement('div');
-       setOfferText.setAttribute('class',"fbutton");
-
-          setOfferText.innerHTML = "Set offer Text";
+       setOfferText.setAttribute('class',"button");
+       setOfferText.style["cursor"] = "pointer";
+	   
+        setOfferText.innerHTML = "Set offer Text";
        curElement.appendChild(setOfferText);
-           
-           setOfferText.addEventListener("mouseover", function (event) {
-                setOfferText.style["background-color"] = "#808080";
-           });
-           setOfferText.addEventListener("mouseleave", function (event) {
-                setOfferText.style["background-color"] = "#C0C0C0";
-           });
+
            
            setOfferText.addEventListener("click", function (event) {
                GM_setValue("offertext",offertext.value);
-               alert("Text Saved");
-               console.log("Changed offer-text");
+               alert("Saved");
+
            });
            
            
        var offeritems = document.createElement('textarea');
-          offeritems.setAttribute('placeholder',"Enter you Items here , example itemid,itemid.."); 
+          offeritems.setAttribute('placeholder',"Enter your Items here , example itemid,itemid.."); 
           offeritems.style["margin-top"] = "25px";
-          offeritems.style["width"] = "580px";
+          offeritems.style["width"] = "100%";
           offeritems.setAttribute('value',"");
           offeritems.setAttribute('id',"offertext");
        curElement.appendChild(offeritems);
@@ -816,34 +822,29 @@ Initialize.Settings = function () {
           };
        
        var div = document.createElement('div');
-       div.setAttribute('class',"fbutton");
+       div.setAttribute('class',"button");
+       div.style["cursor"] = "pointer";
  
           div.innerHTML = "Set offer items";
        curElement.appendChild(div);
-           
-           div.addEventListener("mouseover", function (event) {
-                div.style["background-color"] = "#808080";
-           });
-           div.addEventListener("mouseleave", function (event) {
-                div.style["background-color"] = "#C0C0C0";
-           });
+
            
            div.addEventListener("click", function (event) {
               if (offeritems.value == "") {
                    GM_setValue("offeritems","");
                }
                GM_setValue("offeritems",offeritems.value);
-               alert("Items Saved");
-               console.log("Changed offer-items");
+               alert("Saved");
+
            });
            
            
            
 
           var ctext = document.createElement('textarea');
-          ctext.setAttribute('placeholder',"Enter you nickname here, used for getting your posts!"); 
+          ctext.setAttribute('placeholder',"Enter your nickname here, used for getting your posts!"); 
           ctext.style["margin-top"] = "25px";
-          ctext.style["width"] = "580px";
+          ctext.style["width"] = "100%";
           ctext.setAttribute('value',"");
           ctext.setAttribute('id',"Nickname");
        curElement.appendChild(ctext);
@@ -852,28 +853,51 @@ Initialize.Settings = function () {
           };
        
        var div1 = document.createElement('div');
-       div1.setAttribute('class',"fbutton");
+       div1.setAttribute('class',"button");
+       div1.style["cursor"] = "pointer";
  
           div1.innerHTML = "Set Nickname";
        curElement.appendChild(div1);
-           
-           div1.addEventListener("mouseover", function (event) {
-                div1.style["background-color"] = "#808080";
-           });
-           div1.addEventListener("mouseleave", function (event) {
-                div1.style["background-color"] = "#C0C0C0";
-           });
+
            
            div1.addEventListener("click", function (event) {
               if (ctext.value == "") {
                    GM_setValue("Nickname","None");
                }
                GM_setValue("Nickname",ctext.value);
-               alert("Nickname Saved");
-               console.log("Changed Nickname");
+               alert("Saved");
            });
            
        }
+	   
+			var dback_text = document.createElement('textarea');
+          dback_text.setAttribute('placeholder',"Please enter the the amount of days you want the statistic of each team to check"); 
+          dback_text.style["margin-top"] = "25px";
+          dback_text.style["width"] = "100%";
+          dback_text.setAttribute('value',"");
+          dback_text.setAttribute('id',"DaysBack");
+       curElement.appendChild(dback_text);
+          if (GM_getValue("daysback")){
+              dback_text.value = GM_getValue("daysback",15);   
+          };
+       
+       var approveBTN = document.createElement('div');
+       approveBTN.setAttribute('class',"button");
+       approveBTN.style["cursor"] = "pointer";
+ 
+          approveBTN.innerHTML = "Set Day-Range";
+       curElement.appendChild(approveBTN);
+
+           
+           approveBTN.addEventListener("click", function (event) {
+              if (dback_text.value == "") {
+                   GM_setValue("daysback",15);
+               }
+               GM_setValue("daysback",dback_text.value);
+               alert("Saved");
+               console.log("Changed 'daysback'");
+           });
+           
 }
 Initialize.ini();
 
