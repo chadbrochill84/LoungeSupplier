@@ -338,7 +338,7 @@ Initialize.match = function () {
     team1_display.style["cursor"] = "pointer";
     team1_display.style["margin-top"] = "12px";
     team1_display.style["width"] = "46.5%";
-    team1_display.style["height"] = "50%";
+    team1_display.style["height"] = "52%";
     team1_display.style["float"] = "left";
     team1_display.style["background-color"] = "darkgreen";
     team1_display.innerHTML = team1 + " <p style='font-size:10px;'>data from the last "+numberOfDaysBack+" days </p>";
@@ -416,7 +416,7 @@ Initialize.match = function () {
     team2_display.style["cursor"] = "pointer";
     team2_display.style["margin-top"] = "12px";
     team2_display.style["width"] = "46.5%";
-    team2_display.style["height"] = "50%";
+    team2_display.style["height"] = "52%";
     team2_display.style["float"] = "right";
     team2_display.style["background-color"] = "darkgreen";
     team2_display.innerHTML = team2 + " <p style='font-size:10px;'>data from the last "+numberOfDaysBack+" days </p>";;
@@ -543,7 +543,7 @@ Initialize.match = function () {
             $("#bet_stats_title").html("Team Stats ( click to expand )");
             box.removeClass("opened");
         } else if (!box.hasClass("opened")){
-            box.css({"width":"50%","height":"200","overflow":"visible"});
+            box.css({"width":"50%","height":"210","overflow":"visible"});
             box.addClass("opened");
             $("#bet_stats_title").html("Team Stats ( click to retract )");
         };
