@@ -17,5 +17,5 @@ It gives you the option to AutoBump your trades and remove all your offers at on
 Basicly it should look something like this if you are offering keys ( http://i.imgur.com/5fuQ9fo.jpg )
 
 ## How it works with betting
-Simply visit a Teampage and it´ll show up stats for each team.
+Simply visit a Matchpage and it´ll show up stats for each team.
 
