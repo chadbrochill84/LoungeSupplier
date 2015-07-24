@@ -9,6 +9,7 @@
 // @grant              GM_getValue
 // @grant              GM_setValue
 // @grant              GM_xmlhttpRequest
+// @downloadURL 		https://raw.githubusercontent.com/Z8pn/LoungeSupplier/master/main.js
 // ==/UserScript==
 
 var Nickname;
