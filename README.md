@@ -11,7 +11,7 @@ It also provides a simple statistic overview for matches / teams.
 Click here to install the Script : https://raw.githubusercontent.com/Z8pn/LoungeSupplier/master/main.user.js
 
 
-### Featurelist so far
+###Feature List so far
 * Auto Offer Poster
 * Auto-Bumper
 * Mass-Offer-Remover
