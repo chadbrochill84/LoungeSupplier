@@ -17,6 +17,7 @@ var TextToSend;
 var numberOfDaysBack;
 var CurrentLoungeSite;
 var settings = {};
+var notes = {};
 var CurrentMatches = {};
 var WaitBeforeOffers = 0; // Message box after each pop-up ?
 var WindowTimeOut = 5000; // MS after the window gets closed if the offer wasn´t posted
@@ -103,6 +104,7 @@ Initialize.ini = function() {
     ItemInOffer = GM_getValue("offeritems","");
     numberOfDaysBack = GM_getValue("daysback",15);
 	settings = GM_getValue("settings",{});
+	notes = GM_getValue("notes",{});
 	
     TextToSend = GM_getValue("offertext","Please enter a text in the settings");
     if (TextToSend == "undefined"){
@@ -175,6 +177,63 @@ Initialize.match = function () {
     if (GM_getValue("matches","undefined") == "undefined") {
         UpdateMatchHistory()
     }
+	
+	// About Notes for games etc...
+		if (notes[window.location.href.replace("http://csgolounge.com/match?m=","")]) {
+			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>View Note</a> " + document.getElementsByClassName("half")[2].innerHTML
+		} else {
+			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>Add Note</a> " + document.getElementsByClassName("half")[2].innerHTML
+		}
+		document.getElementById("viewnote").addEventListener('click', function(mouseEvent) {
+				if (document.getElementById("note_window")) {
+							var elem = document.getElementById("note_window");
+							elem.parentElement.removeChild(elem);
+				} else {
+				var pos = document.getElementById('viewnote').getClientRects()[0];
+				jQuery('<div/>', {
+					id: 'note_window',
+					style: 
+						'position:absolute;'+
+						'top:' + (pos.top+15) + 'px;'+
+						'left:'+(pos.left-120)+'px;'+
+						'width:300px;'+
+						'height:250px;' +
+						'overflow:hidden;' +
+						'background-color:grey;'+
+						'border-radius: 2px;'
+
+				}).appendTo(document.body);
+				    var note_edit = document.createElement('textarea');
+					note_edit.setAttribute('id',"note_editfield");
+					note_edit.style["width"] = "99%";
+					note_edit.style["height"] = "100%";
+					note_edit.style["margin-top"] = "-2px";
+					note_edit.style["resize"] = "none";
+					if (notes[window.location.href.replace("http://csgolounge.com/match?m=","")]) {
+					note_edit.innerHTML = notes[window.location.href.replace("http://csgolounge.com/match?m=","").toString()].toString();
+					}
+					
+					console.log(notes[window.location.href.replace("http://csgolounge.com/match?m=","")]);
+					document.getElementById("note_window").appendChild(note_edit);
+				
+					note_edit.onchange = function() {
+						notes[window.location.href.replace("http://csgolounge.com/match?m=","").toString()] = note_edit.value;
+						GM_setValue("notes",notes);
+					}
+				
+					window.addEventListener("resize", function () {
+							var elem = document.getElementById("note_window");
+							elem.parentElement.removeChild(elem);
+					});
+				}
+		
+		
+		});
+	
+	
+	
+	//
+	
 
     document.getElementsByTagName("span")[1].innerHTML = "<a id = 'refresh' style='font-size:10px'>refresh</a> <br>" + document.getElementsByTagName("span")[1].innerHTML;
     document.getElementById("refresh").addEventListener('click', function(mouseEvent) {
