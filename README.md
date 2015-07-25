@@ -10,6 +10,14 @@ It also provides a simple statistic overview for matches / teams.
 
 Click here to install the Script : https://raw.githubusercontent.com/Z8pn/LoungeSupplier/master/main.user.js
 
+
+### Featurelist so far
+* Auto Offer Poster
+* Auto-Bumper
+* Mass-Offer-Remover
+* Team Stats below Matches
+* Add/View Notes for Matches
+
 ## How to install on chrome ?
   http://i.imgur.com/xkHBR1Z.gif
 
