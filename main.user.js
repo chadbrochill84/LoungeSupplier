@@ -165,10 +165,10 @@ Initialize.addElements = function() {
 Initialize.predictor = function (team1stats,team2stats) {
 	if (team1stats.matches > 1 && team2stats.matches > 1) {
 		if (team1stats.ratio > team2stats.ratio) {
-			document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML + "<p style='font-size:10px;'>( Predicted Winner ) </p>";
+			document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML;
    
 		} else {
-			document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML + "<p style='font-size:10px;'>( Predicted Winner ) </p>";
+			document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML ;
 		}
 	}
 }
