@@ -20,5 +20,7 @@ Click here to install the Script : https://raw.githubusercontent.com/Z8pn/Lounge
 
 2. How to use the "Auto Trade Poster" : http://i.imgur.com/wqg58IY.gif
 
+3. How to add notes to matches : http://i.imgur.com/QE6JZSI.gif
+
 
 
