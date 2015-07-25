@@ -192,9 +192,9 @@ Initialize.match = function () {
 	
 	// About Notes for games etc...
 		if (notes[window.location.href.replace("http://csgolounge.com/match?m=","")]) {
-			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>View Note</a> " + document.getElementsByClassName("half")[2].innerHTML
+			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>View Note</a> " + document.getElementsByClassName("half")[1].innerHTML
 		} else {
-			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>Add Note</a> " + document.getElementsByClassName("half")[2].innerHTML
+			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>Add Note</a> " + document.getElementsByClassName("half")[1].innerHTML
 		}
 		document.getElementById("viewnote").addEventListener('click', function(mouseEvent) {
 				if (document.getElementById("note_window")) {
