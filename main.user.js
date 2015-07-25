@@ -162,6 +162,18 @@ Initialize.addElements = function() {
 }
 
 
+Initialize.predictor = function (team1stats,team2stats) {
+	if (team1stats.matches > 1 && team2stats.matches > 1) {
+		if (team1stats.ratio > team2stats.ratio) {
+			document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML + " ( P )";
+   
+		} else {
+			document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML + " ( P )";
+		}
+	}
+}
+
+
 Initialize.match = function () {
     function UpdateMatchHistory() {
         GM_xmlhttpRequest({
@@ -381,6 +393,10 @@ Initialize.match = function () {
     teams[team1].ratio = (100/teams[team1].matches * teams[team1].won).toFixed(2);
     teams[team2].ratio = (100/teams[team2].matches * teams[team2].won).toFixed(2);
 
+	if (settings["predictor"] == "on") {
+		Initialize.predictor(teams[team1],teams[team2]);
+	}
+	
     var fullbar = document.getElementsByClassName("full")[0];
     var spoiler_bar = document.createElement('div');
     spoiler_bar.setAttribute('id',"bet_stats");
@@ -979,37 +995,78 @@ Initialize.Settings = function () {
        alert("Saved");
        console.log("Changed 'daysback'");
    });
-		var settings_last5matches = document.createElement('div');
-		settings_last5matches.setAttribute('class',"button");
-		settings_last5matches.style["cursor"] = "pointer";
-		settings_last5matches.style["margin-top"] = "50px";
-		settings_last5matches.style["margin-left"] = "50px";
+   
+				jQuery('<div/>', {
+					id: 'last5matches',
+					html:'Show Last 5 Matches',
+					class:'button',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 380 + 'px;'+
+						'left:'+150+'px;'
 
-		settings_last5matches.innerHTML = "Show Last 5 Matches";
-		curElement.appendChild(settings_last5matches);
+				}).appendTo(document.body);
+				
+				document.getElementById("last5matches").addEventListener("click", function (event) {
+					settings["teamstatsop1"] = "last5matches";
+					GM_setValue("settings",settings);
+					alert("Saved");
+				});
+				
+				jQuery('<div/>', {
+					id: 'showwinratio',
+					html:'Show Win Ratio',
+					class:'button',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 410 + 'px;'+
+						'left:'+150+'px;'
 
+				}).appendTo(document.body);
+				
+				document.getElementById("showwinratio").addEventListener("click", function (event) {
+					settings["teamstatsop1"] = "winratio";
+					GM_setValue("settings",settings);
+					alert("Saved");
+				});
+				
+				jQuery('<div/>', {
+					id: 'showpredictions',
+					html:'Show Prediction Based on Stats',
+					class:'button',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 380 + 'px;'+
+						'left:'+350+'px;'
 
-		settings_last5matches.addEventListener("click", function (event) {
-			settings["teamstatsop1"] = "last5matches";
-			GM_setValue("settings",settings);
-			alert("Saved");
-		});
-		
-		var settings_showwinratio = document.createElement('div');
-		settings_showwinratio.setAttribute('class',"button");
-		settings_showwinratio.style["cursor"] = "pointer";
-		settings_showwinratio.style["margin-top"] = "50px";
+				}).appendTo(document.body);
+				
+				document.getElementById("showpredictions").addEventListener("click", function (event) {
+					settings["predictor"] = "on";
+					GM_setValue("settings",settings);
+					alert("Saved");
+				});
+				jQuery('<div/>', {
+					id: 'hidepredictions',
+					html:'Hide Prediction Based on Stats',
+					class:'button',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 410 + 'px;'+
+						'left:'+350+'px;'
 
-		settings_showwinratio.innerHTML = "Show Win Ratio";
-		curElement.appendChild(settings_showwinratio);
+				}).appendTo(document.body);
+				
+				document.getElementById("hidepredictions").addEventListener("click", function (event) {
+					settings["predictor"] = "off";
+					GM_setValue("settings",settings);
+					alert("Saved");
+				});
 
-
-		settings_showwinratio.addEventListener("click", function (event) {
-			settings["teamstatsop1"] = "winratio";
-			GM_setValue("settings",settings);
-			alert("Saved");
-		});
-		
 }
 
 Initialize.ini();
