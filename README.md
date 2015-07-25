@@ -17,6 +17,7 @@ Click here to install the Script : [Install](https://raw.githubusercontent.com/Z
 * Mass-Offer-Remover
 * Team Stats below Matches
 * Add/View Notes for Matches
+* Matche Prediction based on Stats ( not always right !! )
 
 ## How to install ?
   You Need TamperMonkey for Chrome and GreaseMonkey for FireFox
