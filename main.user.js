@@ -170,23 +170,65 @@ Initialize.addElements = function() {
     }
 }
 
-// In "progress"
 Initialize.scrapematch = function (matchurl) {
+var needmatch = matchurl.replace(Site+"/match?m=","");
 var JSON_OBject = GM_getValue("matches");
 	for (i = 0; i < JSON_OBject.length; i++) {
-	
-	
+		var matchid = JSON_OBject[i]["match"].toString();
+		if (matchid == needmatch) {
+			var temp = new Array();
+			temp["matchid"] = JSON_OBject[i]["match"].toString();
+			temp["team1"] = JSON_OBject[i]["a"].toString();
+			temp["team2"] = JSON_OBject[i]["b"].toString();
+			temp["winner"] = JSON_OBject[i]["winner"].toString();
+			temp["bestof"] = JSON_OBject[i]["format"].toString();
+			
+			return temp;
+		}
 	}
+	
+	return null;
 }
 
 
 Initialize.predictor = function (team1stats,team2stats) {
 	if (team1stats.matches > 1 && team2stats.matches > 1) {
-		if (team1stats.ratio > team2stats.ratio) {
-			document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML;
-   
-		} else {
-			document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML ;
+		var team1won = 0;
+		var team2won = 0;
+		
+			if (settings["prediction_includewinstreak"] == true) {
+				var team1last5 = team1stats.last5matches.slice(-5);
+				for (var i=0; i<team1last5.length; i++) {
+					var tempdata = Initialize.scrapematch(team1last5[i]);
+					if ((tempdata["team1"] == team1stats.name) && (tempdata["winner"] == "a")) {
+						team1won += 1;
+					}
+					if ((tempdata["team2"] == team1stats.name) && (tempdata["winner"] == "b")) {
+						team1won += 1;
+					}
+				}
+				var team2last5 = team2stats.last5matches.slice(-5);
+				for (var i=0; i<team2last5.length; i++) {
+					var tempdata = Initialize.scrapematch(team2last5[i]);
+					if ((tempdata["team1"] == team2stats.name) && (tempdata["winner"] == "a")) {
+						team2won += 1;
+					}
+					if ((tempdata["team2"] == team2stats.name) && (tempdata["winner"] == "b")) {
+						team2won += 1;
+					}
+				}
+					if ((team1stats.ratio > team2stats.ratio) && (team1won >= team2won)) {
+						document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML;
+					} else if ((team1stats.ratio < team2stats.ratio)  && (team2won >= team1won)) {
+						document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML ;
+					}
+			
+			} else {
+				if ((team1stats.ratio > team2stats.ratio)) {
+					document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML;
+				} else if ((team1stats.ratio < team2stats.ratio)) {
+					document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML ;
+				}
 		}
 	}
 }
@@ -281,6 +323,7 @@ Initialize.match = function () {
     var JSON_OBject = GM_getValue("matches");
     var teams = {}
     teams[team1] = {}
+    teams[team1].name = team1;
     teams[team1].matches = 0;
     teams[team1].last5matches = new Array();
     teams[team1].won = 0;
@@ -289,6 +332,7 @@ Initialize.match = function () {
     teams[team1].ratio = 0;
     teams[team1].vsmatcheswon = 0;
     teams[team2] = {}
+	teams[team2].name = team2;
     teams[team2].matches = 0;
 	teams[team2].last5matches = new Array();
     teams[team2].won = 0;
@@ -899,8 +943,6 @@ Initialize.Settings = function () {
 
     //document.head.innerHTML = "";
     document.body.innerHTML = "";
-    document.body.style["background"] = "darkgreen";
-    document.head.style["background"] = "darkgreen";
 
     var curElement = document.getElementsByTagName("body")[0]
     if (curElement){
@@ -1084,6 +1126,33 @@ Initialize.Settings = function () {
 					GM_setValue("settings",settings);
 					alert("Saved");
 				});
+				
+				
+				jQuery('<input/>', {
+					id: 'checkbox_include_winstreak',
+					type:'checkbox',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 450 + 'px;'+
+						'left:'+350+'px;'
+
+				}).appendTo(document.body);
+				
+				jQuery('<label/>', {
+					html:'Check Winning Streak for \"Predictions\"',
+					style: 
+						'font-size:11px;'+
+						'position:absolute;'+
+						'top:' + 455 + 'px;'+
+						'left:'+370+'px;'
+
+				}).appendTo(document.body);
+
+					document.getElementById("checkbox_include_winstreak").onchange = function() {
+						settings["prediction_includewinstreak"] = document.getElementById("checkbox_include_winstreak").checked;
+						GM_setValue("settings",settings);
+					}
 
 }
 
