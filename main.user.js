@@ -1,9 +1,10 @@
 // ==UserScript==
-// @name                CSGOLounge Lounge Supplier
-// @namespace           CSGOLounge Lounge Supplier
+// @name                Lounge Supplier
+// @namespace           Lounge Supplier
 // @author              Z8pn
 // @author_steam        http://steamcommunity.com/profiles/76561198142908602
 // @include             /^http(s)?://(www.)?csgolounge.com//
+// @include             /^http(s)?://(www.)?dota2lounge.com//
 // @require             http://code.jquery.com/jquery-2.1.1.js
 // @grant               GM_addStyle
 // @grant               GM_getValue
@@ -25,6 +26,14 @@ var WindowCanTimeout = 0; // Window closes itself if no response.
 
 var useful = {};
 var Initialize = {};
+
+var Site;
+if (window.location.href.indexOf("csgolounge.com") > -1) {
+	Site = "http://csgolounge.com";
+}
+if (window.location.href.indexOf("dota2lounge.com") > -1) {
+	Site = "http://dota2lounge.com";
+}
 
 
 useful.getTodaysDate = function() {
@@ -156,9 +165,18 @@ Initialize.addElements = function() {
 
         curElement.appendChild(settings);
         settings.addEventListener('click', function(mouseEvent) {
-            var myWindow=window.open('http://csgolounge.com/#settings','','width=650,height=500,resizable=0,scrollbars=0,left=0,top=0');
+            var myWindow=window.open(Site+'/#settings','','width=650,height=500,resizable=0,scrollbars=0,left=0,top=0');
         });
     }
+}
+
+// In "progress"
+Initialize.scrapematch = function (matchurl) {
+var JSON_OBject = GM_getValue("matches");
+	for (i = 0; i < JSON_OBject.length; i++) {
+	
+	
+	}
 }
 
 
@@ -178,7 +196,7 @@ Initialize.match = function () {
     function UpdateMatchHistory() {
         GM_xmlhttpRequest({
             method: "GET",
-            url: "http://csgolounge.com/api/matches.php",
+            url: Site+"/api/matches.php",
             onload: function(response) {
                 alert("Updated Match History");
                 GM_setValue("matches",$.parseJSON(response.response));
@@ -191,7 +209,7 @@ Initialize.match = function () {
     }
 	
 	// About Notes for games etc...
-		if (notes[window.location.href.replace("http://csgolounge.com/match?m=","")]) {
+		if (notes[window.location.href.replace(Site+"/match?m=","")]) {
 			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>View Note</a> " + document.getElementsByClassName("half")[1].innerHTML
 		} else {
 			document.getElementsByClassName("half")[1].innerHTML = "<a id='viewnote'>Add Note</a> " + document.getElementsByClassName("half")[1].innerHTML
@@ -221,15 +239,15 @@ Initialize.match = function () {
 					note_edit.style["height"] = "100%";
 					note_edit.style["margin-top"] = "-2px";
 					note_edit.style["resize"] = "none";
-					if (notes[window.location.href.replace("http://csgolounge.com/match?m=","")]) {
-					note_edit.innerHTML = notes[window.location.href.replace("http://csgolounge.com/match?m=","").toString()].toString();
+					if (notes[window.location.href.replace(Site+"/match?m=","")]) {
+					note_edit.innerHTML = notes[window.location.href.replace(Site+"/match?m=","").toString()].toString();
 					}
 					
-					console.log(notes[window.location.href.replace("http://csgolounge.com/match?m=","")]);
+					console.log(notes[window.location.href.replace(Site+"/match?m=","")]);
 					document.getElementById("note_window").appendChild(note_edit);
 				
 					note_edit.onchange = function() {
-						notes[window.location.href.replace("http://csgolounge.com/match?m=","").toString()] = note_edit.value;
+						notes[window.location.href.replace(Site+"/match?m=","").toString()] = note_edit.value;
 						GM_setValue("notes",notes);
 					}
 				
@@ -294,7 +312,7 @@ Initialize.match = function () {
             if (matchday > todayWithDaysBack) {
                 if (teama == team1 || teamb == team1) {
                     teams[team1].matches += 1;
-					teams[team1].last5matches.push("http://csgolounge.com/match?m="+matchid);
+					teams[team1].last5matches.push(Site+"/match?m="+matchid);
 
                     if (teama == team1) {
                         if (JSON_OBject[i]["winner"] == "a") {
@@ -320,7 +338,7 @@ Initialize.match = function () {
                 } else if (teama == team2 || teamb == team2) {
                     teams[team2].matches += 1;
 					
-					teams[team2].last5matches.push("http://csgolounge.com/match?m="+matchid);
+					teams[team2].last5matches.push(Site+"/match?m="+matchid);
 					
                     if (teama == team2) {
                         if (JSON_OBject[i]["winner"] == "a") {
@@ -649,9 +667,9 @@ Initialize.MyTrades = function () {
 
     m_t_btn.addEventListener("click", function (event) {
         if ( window.location.href.indexOf("#autobump") > -1){
-            window.location.href = "http://csgolounge.com/mytrades";
+            window.location.href = Site+"/mytrades";
         }else{
-            window.location.href = "http://csgolounge.com/mytrades#autobump";
+            window.location.href = Site+"/mytrades#autobump";
             window.location.reload(true);
         }
     });
