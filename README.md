@@ -1,6 +1,6 @@
 # LoungeSupplier
 ## What is this ?
-A Simple csgolounge extension using GreaseMonkey ( FireFox )/ TamperMonkey( Chrome ).
+A Simple csgolounge/dota2lounge extension using GreaseMonkey ( FireFox )/ TamperMonkey( Chrome ).
 
 LoungeSupplier allows you to mass post your trade offers below trades on lounge.
 
