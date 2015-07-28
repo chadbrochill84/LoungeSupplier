@@ -1,16 +1,16 @@
 // ==UserScript==
-// @name                Lounge Supplier
-// @namespace           Lounge Supplier
-// @author              Z8pn
-// @author_steam        http://steamcommunity.com/profiles/76561198142908602
-// @include             /^http(s)?://(www.)?csgolounge.com//
-// @include             /^http(s)?://(www.)?dota2lounge.com//
-// @require             http://code.jquery.com/jquery-2.1.1.js
-// @grant               GM_addStyle
-// @grant               GM_getValue
-// @grant               GM_setValue
-// @grant               GM_xmlhttpRequest
-// @updateURL 			https://github.com/Z8pn/LoungeSupplier/raw/master/main.user.js
+// @name				Lounge Supplier
+// @namespace			Lounge Supplier
+// @author				Z8pn
+// @author_steam		http://steamcommunity.com/profiles/76561198142908602
+// @include				/^http(s)?://(www.)?csgolounge.com//
+// @include				/^http(s)?://(www.)?dota2lounge.com//
+// @require				http://code.jquery.com/jquery-2.1.1.js
+// @grant				GM_addStyle
+// @grant				GM_getValue
+// @grant				GM_setValue
+// @grant				GM_xmlhttpRequest
+// @updateURL			https://github.com/Z8pn/LoungeSupplier/raw/master/main.user.js
 // ==/UserScript==
 
 var Nickname;
