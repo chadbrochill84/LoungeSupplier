@@ -10,6 +10,7 @@
 // @grant               GM_getValue
 // @grant               GM_setValue
 // @grant               GM_xmlhttpRequest
+// @updateURL 			https://github.com/Z8pn/LoungeSupplier/raw/master/main.user.js
 // ==/UserScript==
 
 var Nickname;
@@ -200,23 +201,40 @@ Initialize.predictor = function (team1stats,team2stats) {
 				var team1last5 = team1stats.last5matches.slice(-5);
 				for (var i=0; i<team1last5.length; i++) {
 					var tempdata = Initialize.scrapematch(team1last5[i]);
-					if ((tempdata["team1"] == team1stats.name) && (tempdata["winner"] == "a")) {
-						team1won += 1;
+					if (tempdata["team1"] == team1stats.name) {
+						if (tempdata["winner"] == "a") {
+							team1won += 1;
+						} else {
+							team1won -= 1;
+						}
 					}
-					if ((tempdata["team2"] == team1stats.name) && (tempdata["winner"] == "b")) {
-						team1won += 1;
+					if (tempdata["team2"] == team1stats.name) {
+						if (tempdata["winner"] == "b") {
+							team1won += 1;
+						} else {
+							team1won -= 1;
+						}
 					}
 				}
 				var team2last5 = team2stats.last5matches.slice(-5);
 				for (var i=0; i<team2last5.length; i++) {
 					var tempdata = Initialize.scrapematch(team2last5[i]);
-					if ((tempdata["team1"] == team2stats.name) && (tempdata["winner"] == "a")) {
-						team2won += 1;
+					if (tempdata["team1"] == team2stats.name) {
+						if (tempdata["winner"] == "a") {
+							team2won += 1;
+						} else {
+							team2won -= 1;
+						}
 					}
-					if ((tempdata["team2"] == team2stats.name) && (tempdata["winner"] == "b")) {
-						team2won += 1;
+					if (tempdata["team2"] == team2stats.name) {
+						if (tempdata["winner"] == "b") {
+							team2won += 1;
+						} else {
+							team2won -= 1;
+						}
 					}
 				}
+
 					if ((team1stats.ratio > team2stats.ratio) && (team1won >= team2won)) {
 						document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML = "<p style='font-size:10px;'>( Predicted Winner ) </p>" + document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML;
 					} else if ((team1stats.ratio < team2stats.ratio)  && (team2won >= team1won)) {
