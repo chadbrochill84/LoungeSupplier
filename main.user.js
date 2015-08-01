@@ -171,24 +171,38 @@ Initialize.addElements = function() {
     }
 }
 
+function UpdateMatchHistory() {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: Site+"/api/matches.php",
+            onload: function(response) {
+                GM_setValue("matches",$.parseJSON(response.response));
+            }
+        });
+    };
+
 Initialize.scrapematch = function (matchurl) {
 var needmatch = matchurl.replace(Site+"/match?m=","");
+var matchthere = 0;
 var JSON_OBject = GM_getValue("matches");
 	for (i = 0; i < JSON_OBject.length; i++) {
 		var matchid = JSON_OBject[i]["match"].toString();
 		if (matchid == needmatch) {
+			matchthere = 1
 			var temp = new Array();
 			temp["matchid"] = JSON_OBject[i]["match"].toString();
 			temp["team1"] = JSON_OBject[i]["a"].toString();
 			temp["team2"] = JSON_OBject[i]["b"].toString();
 			temp["winner"] = JSON_OBject[i]["winner"].toString();
 			temp["bestof"] = JSON_OBject[i]["format"].toString();
-			
+			temp["when"] = JSON_OBject[i]["when"].toString();
 			return temp;
 		}
 	}
-	
-	return null;
+	if (matchthere == 0) {
+		UpdateMatchHistory()
+	}
+	return;
 }
 
 
@@ -253,20 +267,18 @@ Initialize.predictor = function (team1stats,team2stats) {
 
 
 Initialize.match = function () {
-    function UpdateMatchHistory() {
-        GM_xmlhttpRequest({
-            method: "GET",
-            url: Site+"/api/matches.php",
-            onload: function(response) {
-                alert("Updated Match History");
-                GM_setValue("matches",$.parseJSON(response.response));
-            }
-        });
-    };
-
     if (GM_getValue("matches","undefined") == "undefined") {
         UpdateMatchHistory()
     }
+	
+	
+	
+		var matchdata = Initialize.scrapematch(window.location.href);
+		if (matchdata) {
+			document.getElementsByClassName("half")[2].innerHTML = matchdata["when"];
+		} else {
+		UpdateMatchHistory();		
+		}
 	
 	// About Notes for games etc...
 		if (notes[window.location.href.replace(Site+"/match?m=","")]) {
@@ -320,11 +332,33 @@ Initialize.match = function () {
 		
 		});
 	
+		document.getElementsByClassName("half")[2].innerHTML = "<a id='export' >Export</a> " + document.getElementsByClassName("half")[2].innerHTML
+		document.getElementById("export").addEventListener('click', function(mouseEvent) {
+				var mstring ="";
+				mstring += document.getElementsByClassName("half")[2].innerHTML.replace("<a id=\"export\">Export</a> ","");
+				mstring += "	";
+				mstring += document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML.toString();
+				mstring += "	";
+				mstring += document.getElementsByTagName("span")[0].getElementsByTagName("i")[0].innerHTML.toString().replace("%","");
+				mstring += "	";
+				mstring += document.getElementsByTagName("span")[2].getElementsByTagName("i")[0].innerHTML.toString().replace("%","");
+				mstring += "	";
+				mstring += document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML.toString();
+				mstring += "	";
+				if (document.getElementsByClassName("box")[0].getElementsByTagName("a")[2].getAttribute("class") == "active") {
+					mstring += document.getElementsByTagName("span")[0].getElementsByTagName("b")[0].innerHTML.toString();
+				}else {
+					mstring += document.getElementsByTagName("span")[2].getElementsByTagName("b")[0].innerHTML.toString();
+				}
+				mstring += "	";
+				mstring += document.getElementsByClassName("yourVal")[0].innerHTML.replace(".",",");
+				prompt("Export to spreadsheet ( copy the following )", mstring);
 	
+	});
 	
 	//
 	
-
+	if (settings["showstats"] == "yes") {
     document.getElementsByTagName("span")[1].innerHTML = "<a id = 'refresh' style='font-size:10px'>refresh</a> <br>" + document.getElementsByTagName("span")[1].innerHTML;
     document.getElementById("refresh").addEventListener('click', function(mouseEvent) {
         UpdateMatchHistory();
@@ -705,6 +739,7 @@ Initialize.match = function () {
     });
 
     GM_addStyle("#bet_stats {text-align:center;font-size:12px;margin:auto;border-radius: 5px;padding:5px 5px 5px 5px;margin-bottom:8px;background-color:#808080}")
+	}
 }
 
 Initialize.MyTrades = function () {
@@ -746,7 +781,7 @@ Initialize.openTrade = function (url){
     window.open(url, "_blank", "width=1,height=1,resizable=yes,scrollbars=yes,left=2400,top=0")
 
     GM_setValue("open_trades",GM_getValue("open_trades",0) + 1);
-    window.focus();
+    //window.focus();
 }
 
 Initialize.results = function () {
@@ -1075,13 +1110,39 @@ Initialize.Settings = function () {
    });
    
 				jQuery('<div/>', {
+					id: 'showstats',
+					html:'Show Team Stats',
+					class:'button',
+					style: 
+						'position:absolute;'+
+						'cursor:pointer;'+
+						'top:' + 380 + 'px;'+
+						'left:'+150+'px;'
+
+				}).appendTo(document.body);
+				if (settings["showstats"] == "yes") {
+				document.getElementById("showstats").innerHTML = "Hide Team Stats";
+				}
+				document.getElementById("showstats").addEventListener("click", function (event) {
+					if (settings["showstats"] == "yes") {	
+						settings["showstats"] = "no";
+						document.getElementById("showstats").innerHTML = "Show Team Stats";
+					} else {
+						settings["showstats"] = "yes";
+						document.getElementById("showstats").innerHTML = "Hide Team Stats";
+					}
+					GM_setValue("settings",settings);
+					alert("Saved");
+				});
+				
+				jQuery('<div/>', {
 					id: 'last5matches',
 					html:'Show Last 5 Matches',
 					class:'button',
 					style: 
 						'position:absolute;'+
 						'cursor:pointer;'+
-						'top:' + 380 + 'px;'+
+						'top:' + 410 + 'px;'+
 						'left:'+150+'px;'
 
 				}).appendTo(document.body);
@@ -1099,7 +1160,7 @@ Initialize.Settings = function () {
 					style: 
 						'position:absolute;'+
 						'cursor:pointer;'+
-						'top:' + 410 + 'px;'+
+						'top:' + 440 + 'px;'+
 						'left:'+150+'px;'
 
 				}).appendTo(document.body);
